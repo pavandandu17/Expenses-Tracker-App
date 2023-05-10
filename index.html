@@ -15,6 +15,8 @@
     <header>
         <h1>Expenses Tracker</h1>
     </header>
+    <h3>This month's expense: <span id="thisMonthsExpense"></span></h3>
+    <h3>Today's expense: <span id="todaysExpense"></span></h3>
     <div class="formContainer">
         <form onsubmit="submitData()" id="inputForm">
             <label for="expenseType">Expense Type</label>
@@ -24,10 +26,10 @@
             <textarea name="expenseDescription" id="expenseDescription" cols="30" rows="3"></textarea>
 
             <label for="expenseAmount">Expense Amount</label>
-            <input type="number" name="expenseAmount" id="expenseAmount">
+            <input type="number" name="expenseAmount" id="expenseAmount" value="26">
 
             <label for="expenseDate">Date</label>
-            <input type="date" name="expenseDate" id="expenseDate">
+            <input type="date" name="expenseDate" id="expenseDate" value="2023-05-10">
 
             <button type="submit" id="submitButton">ADD Expense</button>
         </form>
