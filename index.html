@@ -15,31 +15,72 @@
     <header>
         <h1>Expenses Tracker</h1>
     </header>
-    <h3>This month's expense: <span id="thisMonthsExpense"></span></h3>
-    <h3>Today's expense: <span id="todaysExpense"></span></h3>
-    <div class="formContainer">
-        <form onsubmit="submitData()" id="inputForm">
-            <label for="expenseType">Expense Type</label>
-            <input type="text" name="expenseType" id="expenseType">
+    <main>
 
-            <label for="expenseDescription">Expense Description</label>
-            <textarea name="expenseDescription" id="expenseDescription" cols="30" rows="3"></textarea>
+        <h3>This month's expense: <span id="thisMonthsExpense"></span></h3>
+        <h3>Today's expense: <span id="todaysExpense"></span></h3>
+        <div class="formContainer">
+            <form onsubmit="submitData()" id="inputForm1">
+                <label for="expenseType">Expense Type</label>
+                <input type="text" name="expenseType" id="expenseType">
+    
+                <label for="expenseDescription">Expense Description</label>
+                <textarea name="expenseDescription" id="expenseDescription" cols="30" rows="3"></textarea>
+    
+                <label for="expenseAmount">Expense Amount</label>
+                <input type="number" name="expenseAmount" id="expenseAmount" value="26">
+    
+                <label for="expenseDate">Date</label>
+                <input type="date" name="expenseDate" id="expenseDate" value="2023-05-10">
+    
+                <button type="submit" id="submitButton">ADD Expense</button>
+            </form>
+    
+        </div>
+        <button id="deleteButton" onclick="clearData()">Delete Data</button>
 
-            <label for="expenseAmount">Expense Amount</label>
-            <input type="number" name="expenseAmount" id="expenseAmount" value="26">
-
-            <label for="expenseDate">Date</label>
-            <input type="date" name="expenseDate" id="expenseDate" value="2023-05-10">
-
-            <button type="submit" id="submitButton">ADD Expense</button>
-        </form>
-    </div>
-
-    <button id="clearButton" onclick="clearData()">Clear Data</button>
-    <button id="displayButton" onclick="displayExpenses()">Display Expenses</button>
-    <ul id="displayList">
+        <hr>
         
-    </ul>
+        <form onsubmit="submitForm2()" id="inputForm2">
+            <label for="year">Year</label>
+            <input type="number" name="year" id="year" min="1900" max="2023" oninput="enableMonthDateInputs()" required>
+     
+            <label for="month">Month(optional)</label>
+            <select name="month" id="month" oninput="updateDateInput()" disabled>
+                <option value="" selected disabled>Select an option</option>
+                <option value="1">January</option>
+                <option value="2">February</option>
+                <option value="3">March</option>
+                <option value="4">April</option>
+                <option value="5">May</option>
+                <option value="6">June</option>
+                <option value="7">July</option>
+                <option value="8">August</option>
+                <option value="9">September</option>
+                <option value="10">October</option>
+                <option value="11">November</option>
+                <option value="12">December</option>
+            </select>
+    
+            <label for="date">Date(optional)</label>
+            <input type="number" name="date" id="date" min="0" max="31" disabled>
+
+            <button type="submit" id="form2SubmitButton" disabled>List Expenses</button>
+        </form>
+        <table id="displayTable">
+            <thead>
+                <th>S.No.</th>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Description</th>
+                <th>Amount</th>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+    </main>
+    
 
 </body>
 

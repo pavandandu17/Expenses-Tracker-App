@@ -1,16 +1,21 @@
 const localStorageKey = 'expensesTrackerAppData';
 
-window.onload = showCurrMonthTotalExpense;
-window.addEventListener('storage', showCurrMonthTotalExpense);
+window.onload = showTodayMonthExpense;
 
 let today = new Date();
 
-function showCurrMonthTotalExpense() {
-    let temp = document.getElementById('todaysExpense');
+function showTodayMonthExpense() {
+    let todayDisplayElement = document.getElementById('todaysExpense');
+    monthDisplayElement = document.getElementById('thisMonthsExpense');
+
     const appData = JSON.parse(localStorage.getItem(localStorageKey));
-    temp.innerText = (appData.expenses[today.getFullYear()][today.getMonth()][today.getDate()].totalSum) + "/- Rs";
-    temp = document.getElementById('thisMonthsExpense');
-    temp.innerText = (appData.expenses[today.getFullYear()][today.getMonth()].totalSum) + "/- Rs";
+    if(appData == null) {
+        todayDisplayElement.innerText = 0;        
+        monthDisplayElement.innerText = 0;
+    } else {
+        todayDisplayElement.innerText = (appData.expenses[today.getFullYear()][today.getMonth()][today.getDate()].totalSum) + "/- Rs";
+        monthDisplayElement.innerText = (appData.expenses[today.getFullYear()][today.getMonth()].totalSum) + "/- Rs";
+    }
 }
 
 function submitData() {
@@ -79,10 +84,83 @@ function addExpense(expenseData) {
 
     localStorage.setItem(localStorageKey, JSON.stringify(appData));
 
-    showCurrMonthTotalExpense();
+    showTodayMonthExpense();
 }
 
 function clearData() {
     localStorage.clear();
-    displayExpenses();
+    // displayExpenses();
+    
+    showTodayMonthExpense();
+}
+
+
+function enableMonthDateInputs() {
+    const monthInputEle = document.getElementById('month');
+    const dateInputEle = document.getElementById('date');
+    const submitBtn = document.getElementById('form2SubmitButton');
+    
+    monthInputEle.disabled = false;
+    dateInputEle.disabled = false;
+    submitBtn.disabled = false;
+}
+
+function updateDateInput() {
+    const yearInputEle = document.getElementById('year');
+    const monthInputEle = document.getElementById('month');
+    const dateInputEle = document.getElementById('date');
+    
+    const year = Number(yearInputEle.value);
+    const month = Number(monthInputEle.value);
+    
+    const daysInMonth = new Date(year, month, 0).getDate();
+    dateInputEle.max = daysInMonth;
+}
+
+function submitForm2() {
+    event.preventDefault();
+    
+    const yearInputEle = document.getElementById('year');
+    const monthInputEle = document.getElementById('month');
+    const dateInputEle = document.getElementById('date');
+    
+    const year = Number(yearInputEle.value);
+    const month = Number(monthInputEle.value);
+    const date = Number(dateInputEle.value);
+
+    //If date given, but not month
+    if(month == "" && date != "") {
+        alert("Year, date select chesthe ae month dhi display cheyyali ra erri na modda");
+        return;
+    }
+
+    const appData = JSON.parse(localStorage.getItem(localStorageKey));
+    //If only year is selected
+    if(month == "") {
+        const data = appData.expenses[year];
+
+        const tableEle = document.getElementById('displayTable');
+        const tHead = tableEle.querySelector('thead');
+        tHead.style.display = "table-header-group";
+        const tBody = tableEle.querySelector('tbody');
+        tBody.innerHTML = '';
+        let no = 1;
+        for(let month in data) {
+            if(month == 'totalSum')
+                continue;
+            for(let date in data[month]) {
+                if(date == 'totalSum')
+                    continue;
+                for(let expense of data[month][date].list) {
+                    let row = tBody.insertRow();
+
+                    row.insertCell().innerText = no++;
+                    row.insertCell().innerText = expense.expenseDate;
+                    row.insertCell().innerText = expense.expenseType;
+                    row.insertCell().innerText = expense.expenseDescription;
+                    row.insertCell().innerText = expense.expenseAmount;
+                }
+            }
+        }
+    }
 }

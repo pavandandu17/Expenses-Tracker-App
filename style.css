@@ -28,11 +28,11 @@ h1 {
     box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
 }
 
-form {
+#inputForm1 {
     padding: 20px;
 }
 
-form > *{
+#inputForm1 > *{
     margin-top: 10px;
     display: block;
 }
@@ -62,7 +62,42 @@ label {
     padding-right: 20px;
 }
 
-#displayList {
-    overflow: hidden;
+#deleteButton {
+    display: block;
+    margin: 10px auto;
+}
+
+#inputForm2 {
+    width: fit-content;
+    margin: 30px auto 10px auto;
+}
+
+#form2SubmitButton {
+    display: block;
+    margin: 15px auto;
+}
+
+#displayTable {
+    border-collapse: collapse;
+    background-color: white;
+    width: 80%;
+    margin: 15px auto 0 auto;
+    text-align: center;
+    padding: 0;
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+    
+}
+
+#displayTable > thead {
+    background-color:rgb(72, 131, 239);
+    color: white;
     display: none;
+}
+
+#displayTable th, #displayTable td {
+    margin: 0;
+    padding: 10px;
+}
+#displayTable tr:nth-child(even) {
+    background-color: #f2f2f2;
 }
