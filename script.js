@@ -1,8 +1,8 @@
 function submitData() {
     var expenseType = document.getElementById('expenseType').value;
     var expenseDescription = document.getElementById('expenseDescription').value;
-    var expenseAmount = document.getElementById('expenseAmount').value;
-    var expenseDate = document.getElementById('expenseDate').value;
+    var expenseAmount = Number(document.getElementById('expenseAmount').value);
+    var expenseDate = new Date(document.getElementById('expenseDate').value);
 
     var expenseData = {
         'expenseType': expenseType,
