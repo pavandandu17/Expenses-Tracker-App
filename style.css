@@ -22,7 +22,7 @@ h1 {
 
 .formContainer {
     background-color: white;
-    margin: 75px auto 30px auto;
+    margin: 0px auto 30px auto;
     width: max-content;
 
     box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
