@@ -1,29 +1,62 @@
-function submitData() {
-    var expenseType = document.getElementById('expenseType').value;
-    var expenseDescription = document.getElementById('expenseDescription').value;
-    var expenseAmount = Number(document.getElementById('expenseAmount').value);
-    var expenseDate = new Date(document.getElementById('expenseDate').value);
+const localStorageKey = 'expensesTrackerAppData';
 
-    var expenseData = {
+function submitData() {
+    let expenseType = document.getElementById('expenseType').value;
+    let expenseDescription = document.getElementById('expenseDescription').value;
+    let expenseAmount = Number(document.getElementById('expenseAmount').value);
+    let expenseDate = new Date(document.getElementById('expenseDate').value);
+
+    let expenseData = {
         'expenseType': expenseType,
         'expenseDescription': expenseDescription,
         'expenseAmount': expenseAmount,
         'expenseDate': expenseDate
     }
 
-    if(localStorage.getItem('data') == null)
-        localStorage.setItem('data', JSON.stringify([expenseData]));
-    else
-    {
-        const expenseToAdd = (JSON.parse(localStorage.getItem('data')));
-        expenseToAdd.push(expenseData);
-        localStorage.setItem('data', JSON.stringify(expenseToAdd));
+    //If no record of expenses
+    if(localStorage.getItem(localStorageKey) == null) {
+        let appData = {
+            userName:"Pavan", 
+            expenses:{}
+        };
+
+        //Storing initial object
+        localStorage.setItem(localStorageKey, JSON.stringify(appData));
     }
+
+    addExpense(expenseData);
+}
+
+function addExpense(expenseData) {
+    let appData = JSON.parse(localStorage.getItem(localStorageKey));
+    let year = Number(expenseData.expenseDate.getFullYear());
+    let monthIndex = Number(expenseData.expenseDate.getMonth());
+    let date = Number(expenseData.expenseDate.getDate());
+    
+    let expenses = appData.expenses;
+    //Adding year if not present
+    if(!expenses.hasOwnProperty(year)) {
+        expenses[year] = {}
+    }
+    //Adding month if not present
+    if(!expenses[year].hasOwnProperty(monthIndex)) {
+        expenses[year][monthIndex] = {}
+    }
+    //Adding date if not present
+    if(!expenses[year][monthIndex].hasOwnProperty(date)) {
+        expenses[year][monthIndex][date] = []
+    }
+    
+    //Adding current expense data
+    expenses[year][monthIndex][date].push(expenseData);
+    localStorage.setItem(localStorageKey, JSON.stringify(appData));
 }
 
 function displayExpenses() {
 
-    const data = JSON.parse(localStorage.getItem('data'));
+    const data = JSON.parse(localStorage.getItem(localStorageKey));
+    if(data == null)
+        return;
     const ul = document.getElementById('displayList');
     ul.innerHTML = '';
     for(expense of data)
