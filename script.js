@@ -173,3 +173,32 @@ function submitForm2() {
         }
     }
 }
+
+function displayChart() {
+    const chartMonth = document.getElementById('chartMonth').value;
+    const daysInMonth = new Date(2023, chartMonth, 0).getDate();
+    
+    let labels = [];
+    for(let i=1; i<=daysInMonth; i++) {
+        labels.push(i)
+    }
+
+    let yValues = [];
+    for(let i=1; i<=daysInMonth; i++) {
+        yValues.push(Math.floor(Math.random() * 500) + 1);
+    }
+
+    const barChart = new Chart('barChart', {
+        type: 'bar',
+        data: {
+            labels:labels,
+            datasets: [{
+                data:yValues,
+                label: 'Expense in Rs.',
+                backgroundColor: 'aqua',
+                hoverBackgroundColor: 'green',
+            }]
+        },
+        options: {}
+    });
+};
