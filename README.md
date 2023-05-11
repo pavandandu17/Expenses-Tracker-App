@@ -1,6 +1,7 @@
 # Expenses-Tracker-App
 
 ## Structure of JSON Object 
+
 expensesTrackerAppData = {
     userName:"",
     expenses: {
@@ -36,5 +37,3 @@ expensesTrackerAppData = {
         totalSum: 0
     }
 }
-
-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
