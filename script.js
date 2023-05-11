@@ -195,7 +195,7 @@ function displayChart() {
             datasets: [{
                 data:yValues,
                 label: 'Expense in Rs.',
-                backgroundColor: 'aqua',
+                backgroundColor: 'blue',
                 hoverBackgroundColor: 'green',
             }]
         },
