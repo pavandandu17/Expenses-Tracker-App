@@ -2,7 +2,9 @@
 
 ## Structure of JSON Object 
 
-```expensesTrackerAppData = {
+```javascript
+
+expensesTrackerAppData = {
     userName:"",
     expenses: {
         year1 : {
@@ -34,4 +36,6 @@
         }
         totalSum: 0
     }
-}```
+}
+
+```
