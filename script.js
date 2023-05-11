@@ -9,14 +9,21 @@ function showTodayMonthExpense() {
     monthDisplayElement = document.getElementById('thisMonthsExpense');
 
     const appData = JSON.parse(localStorage.getItem(localStorageKey));
-    let isTodayPresent = appData.expenses[today.getFullYear()][today.getMonth()][today.getDate()] != undefined;
-    let isMonthPresent = appData.expenses[today.getFullYear()][today.getMonth()];
-    if(appData == null || !isTodayPresent || ) {
-        todayDisplayElement.innerText = "0/- Rs";        
+
+    if (appData == null) {
+        todayDisplayElement.innerText = "0/- Rs";
         monthDisplayElement.innerText = "0/- Rs";
     } else {
-        todayDisplayElement.innerText = (appData.expenses[today.getFullYear()][today.getMonth()][today.getDate()].totalSum) + "/- Rs";
-        monthDisplayElement.innerText = (appData.expenses[today.getFullYear()][today.getMonth()].totalSum) + "/- Rs";
+        let todayDate = appData.expenses[today.getFullYear()][today.getMonth()][today.getDate()];
+        let currMonth = appData.expenses[today.getFullYear()][today.getMonth()];
+        if (todayDate == undefined)
+            todayDisplayElement.innerText = "0/- Rs";
+        else
+            todayDisplayElement.innerText = (appData.expenses[today.getFullYear()][today.getMonth()][today.getDate()].totalSum) + "/- Rs";
+        if (currMonth == undefined)
+            monthDisplayElement.innerText = "0/- Rs";
+        else
+            monthDisplayElement.innerText = (appData.expenses[today.getFullYear()][today.getMonth()].totalSum) + "/- Rs";
     }
 }
 
@@ -35,10 +42,10 @@ function submitData() {
     }
 
     //If no record of expenses
-    if(localStorage.getItem(localStorageKey) == null) {
+    if (localStorage.getItem(localStorageKey) == null) {
         let appData = {
-            userName:"Pavan", 
-            expenses:{}
+            userName: "Pavan",
+            expenses: {}
         };
 
         //Storing initial object
@@ -54,28 +61,28 @@ function addExpense(expenseData) {
     let year = Number(expenseData.expenseDate.getFullYear());
     let monthIndex = Number(expenseData.expenseDate.getMonth());
     let date = Number(expenseData.expenseDate.getDate());
-    
+
     let expenses = appData.expenses;
     //Adding year if not present
-    if(!expenses.hasOwnProperty(year)) {
+    if (!expenses.hasOwnProperty(year)) {
         expenses[year] = {
-            totalSum:0
+            totalSum: 0
         };
     }
     //Adding month if not present
-    if(!expenses[year].hasOwnProperty(monthIndex)) {
+    if (!expenses[year].hasOwnProperty(monthIndex)) {
         expenses[year][monthIndex] = {
-            totalSum:0
+            totalSum: 0
         };
     }
     //Adding date if not present
-    if(!expenses[year][monthIndex].hasOwnProperty(date)) {
+    if (!expenses[year][monthIndex].hasOwnProperty(date)) {
         expenses[year][monthIndex][date] = {
             totalSum: 0,
-            list:[]
+            list: []
         };
     }
-    
+
     //Adding current expense data
     expenses[year][monthIndex][date].list.push(expenseData);
 
@@ -92,7 +99,7 @@ function addExpense(expenseData) {
 function clearData() {
     localStorage.clear();
     // displayExpenses();
-    
+
     showTodayMonthExpense();
 }
 
@@ -101,7 +108,7 @@ function enableMonthDateInputs() {
     const monthInputEle = document.getElementById('month');
     const dateInputEle = document.getElementById('date');
     const submitBtn = document.getElementById('form2SubmitButton');
-    
+
     monthInputEle.disabled = false;
     dateInputEle.disabled = false;
     submitBtn.disabled = false;
@@ -111,34 +118,34 @@ function updateDateInput() {
     const yearInputEle = document.getElementById('year');
     const monthInputEle = document.getElementById('month');
     const dateInputEle = document.getElementById('date');
-    
+
     const year = Number(yearInputEle.value);
     const month = Number(monthInputEle.value);
-    
+
     const daysInMonth = new Date(year, month, 0).getDate();
     dateInputEle.max = daysInMonth;
 }
 
 function submitForm2() {
     event.preventDefault();
-    
+
     const yearInputEle = document.getElementById('year');
     const monthInputEle = document.getElementById('month');
     const dateInputEle = document.getElementById('date');
-    
+
     const year = Number(yearInputEle.value);
     const month = Number(monthInputEle.value);
     const date = Number(dateInputEle.value);
 
     //If date given, but not month
-    if(month == "" && date != "") {
+    if (month == "" && date != "") {
         alert("Year, date select chesthe ae month dhi display cheyyali ra erri na modda");
         return;
     }
 
     const appData = JSON.parse(localStorage.getItem(localStorageKey));
     //If only year is selected
-    if(month == "") {
+    if (month == "") {
         const data = appData.expenses[year];
 
         const tableEle = document.getElementById('displayTable');
@@ -147,13 +154,13 @@ function submitForm2() {
         const tBody = tableEle.querySelector('tbody');
         tBody.innerHTML = '';
         let no = 1;
-        for(let month in data) {
-            if(month == 'totalSum')
+        for (let month in data) {
+            if (month == 'totalSum')
                 continue;
-            for(let date in data[month]) {
-                if(date == 'totalSum')
+            for (let date in data[month]) {
+                if (date == 'totalSum')
                     continue;
-                for(let expense of data[month][date].list) {
+                for (let expense of data[month][date].list) {
                     let row = tBody.insertRow();
 
                     row.insertCell().innerText = no++;
