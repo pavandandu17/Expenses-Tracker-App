@@ -113,9 +113,4 @@ label {
 .chartContainer {
     margin: auto;
     width: 70%;
-    overflow-x: scroll;
-}
-
-#barChart {
-    width: 100%;
 }
