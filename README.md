@@ -2,7 +2,7 @@
 
 ## Structure of JSON Object 
 
-expensesTrackerAppData = {
+```expensesTrackerAppData = {
     userName:"",
     expenses: {
         year1 : {
@@ -36,4 +36,4 @@ expensesTrackerAppData = {
         }
         totalSum: 0
     }
-}
+}```
