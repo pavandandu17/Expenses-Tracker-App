@@ -9,9 +9,11 @@ function showTodayMonthExpense() {
     monthDisplayElement = document.getElementById('thisMonthsExpense');
 
     const appData = JSON.parse(localStorage.getItem(localStorageKey));
-    if(appData == null) {
-        todayDisplayElement.innerText = 0;        
-        monthDisplayElement.innerText = 0;
+    let isTodayPresent = appData.expenses[today.getFullYear()][today.getMonth()][today.getDate()] != undefined;
+    let isMonthPresent = appData.expenses[today.getFullYear()][today.getMonth()];
+    if(appData == null || !isTodayPresent || ) {
+        todayDisplayElement.innerText = "0/- Rs";        
+        monthDisplayElement.innerText = "0/- Rs";
     } else {
         todayDisplayElement.innerText = (appData.expenses[today.getFullYear()][today.getMonth()][today.getDate()].totalSum) + "/- Rs";
         monthDisplayElement.innerText = (appData.expenses[today.getFullYear()][today.getMonth()].totalSum) + "/- Rs";
