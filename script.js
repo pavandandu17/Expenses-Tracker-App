@@ -3,41 +3,56 @@ const expenseTypes = ['Food', 'Petrol/Gas', 'Entertainment', 'Fitness/Gym', 'Tra
 let today = new Date();
 
 window.onload = showTodayMonthExpense;
+// let data = {
+//     year: 2023
+// }
+// fdata(data);
+// async function fdata(data) {
+//     const d = await axios.post('http://localhost:3000/getExpenses', data);
+//     console.log(d);
+// }
 
 async function sendData(data) {
-    const res = await axios.post('http://localhost:3000/addExpense', data);
+    try {
+        const res = await axios.post('http://localhost:3000/addExpense', data);
+        console.log("RES:")
+        console.log(res);
+    } catch (err) {
+        console.log(err);
+    }
 }
 
 async function getExpenses(data) {
-    const res = await axios.get('http://localhost:3000/getExpenses', data);
-    return res;
+    const response = await axios.post('http://localhost:3000/getExpenses', data);
+    return response.data;
+
 }
 
-async function getTotalAmount() {
-    const res = await axios.get('http://localhost:3000/getAmount', data);
-    return res;
+async function getTotalAmount(data) {
+    const response = await axios.post('http://localhost:3000/getAmount', data);
+    return response.data;
 }
 
-function showTodayMonthExpense() {
+async function showTodayMonthExpense() {
     let todayDisplayElement = document.getElementById('todaysExpense');
     monthDisplayElement = document.getElementById('thisMonthsExpense');
 
-    let todaysExpense = getData({
+    let todaysExpense = (await getTotalAmount({
         year: today.getFullYear(),
         month: today.getMonth(),
-        date:today.getDate()
-    });
+        date: today.getDate()
+    })).data;
 
-    let monthsExpense = getData({
+    let monthsExpense = (await getTotalAmount({
         year: today.getFullYear(),
         month: today.getMonth()
-    })
+    })).data;
 
     monthDisplayElement.innerText = monthsExpense + "/- Rs";
     todayDisplayElement.innerText = todaysExpense + "/- Rs";
 }
 
-function addExpense() {
+async function addExpense() {
     let expenseType = document.getElementById('expenseType').value;
     let expenseDescription = document.getElementById('expenseDescription').value;
     let expenseAmount = Number(document.getElementById('expenseAmount').value);
@@ -56,12 +71,10 @@ function addExpense() {
     showTodayMonthExpense();
 }
 
-function clearData() {
-    localStorage.clear();
-
+async function clearData() {
+    await axios.get('http://localhost:3000/deleteAll');
     showTodayMonthExpense();
 }
-
 
 function enableMonthDateInputs() {
     const monthInputEle = document.getElementById('month');
@@ -85,7 +98,7 @@ function updateDateInput() {
     dateInputEle.max = daysInMonth;
 }
 
-function submitForm2() {
+async function submitForm2() {
     event.preventDefault();
 
     const yearInputEle = document.getElementById('year');
@@ -104,26 +117,28 @@ function submitForm2() {
 
     let query = {};
     query.year = year;
-    if(month != "")
+    if (month != "")
         query.month = month;
-    if(date != "") 
+    if (date != "")
         query.date = date;
-    
-    const expenses = getExpenses(query);
+
+    var expenses = 0;
+    expenses = await getExpenses(query);
 
     const tableEle = document.getElementById('displayTable');
     const tHead = tableEle.querySelector('thead');
     tHead.style.display = "table-header-group";
     const tBody = tableEle.querySelector('tbody');
     tBody.innerHTML = '';
-    
+
     let no = 1;
     for (let expense of expenses) {
+        console.log(expense);
         let row = tBody.insertRow();
 
         row.insertCell().innerText = no++;
-        row.insertCell().innerText = getFormattedDate(expense.expenseDate);
-        row.insertCell().innerText = expense.expenseType;
+        row.insertCell().innerText = getFormattedDate(expense.date, expense.month + 1, expense.year);
+        row.insertCell().innerText = getExpenseType(expense.expenseType);
         row.insertCell().innerText = expense.expenseDescription;
         row.insertCell().innerText = expense.expenseAmount;
     }
@@ -211,6 +226,6 @@ function getExpenseType(typeIndex) {
     return expenseTypes[typeIndex];
 }
 
-function getFormattedDate(dateObj) {
-    return dateObj.getDate() + "-" + dateObj.getMonth() + "-" + dateObj.getFullYear();
+function getFormattedDate(date, month, year) {
+    return date + "-" + month + "-" + year;
 }
