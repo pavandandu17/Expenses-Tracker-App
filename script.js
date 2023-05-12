@@ -1,8 +1,9 @@
 const localStorageKey = 'expensesTrackerAppData';
+const expenseTypes = ['Food', 'Petrol/Gas', 'Entertainment', 'Fitness/Gym', 'Transport', 'Taxes', 'Investment', 'Shopping', 'Groceries', 'Bills', 'Books', 'Rent', 'EMI', 'Others'];
+let today = new Date();
 
 window.onload = showTodayMonthExpense;
 
-let today = new Date();
 
 function showTodayMonthExpense() {
     let todayDisplayElement = document.getElementById('todaysExpense');
@@ -174,26 +175,46 @@ function submitForm2() {
     }
 }
 
+function enableChartTypeInput() {
+    const chartTypeEle = document.getElementById('chartType');
+    chartTypeEle.disabled = false;
+}
+
 function displayChart() {
+    const chartType = document.getElementById('chartType').value;
+    if (chartType == "bar") {
+        const pieChartEle = document.getElementById('pieChart');
+        pieChartEle.style.display = "none";
+        displayBarChart();
+    } else {
+        const barChartEle = document.getElementById('barChart');
+        barChartEle.style.display = "none";
+        displayPieChart();
+    }
+}
+function displayBarChart() {
     const chartMonth = document.getElementById('chartMonth').value;
     const daysInMonth = new Date(2023, chartMonth, 0).getDate();
-    
+
+    const barChartEle = document.getElementById('barChart');
+    barChartEle.style.display = "block";
+
     let labels = [];
-    for(let i=1; i<=daysInMonth; i++) {
+    for (let i = 1; i <= daysInMonth; i++) {
         labels.push(i)
     }
 
     let yValues = [];
-    for(let i=1; i<=daysInMonth; i++) {
+    for (let i = 1; i <= daysInMonth; i++) {
         yValues.push(Math.floor(Math.random() * 500) + 1);
     }
 
     const barChart = new Chart('barChart', {
         type: 'bar',
         data: {
-            labels:labels,
+            labels: labels,
             datasets: [{
-                data:yValues,
+                data: yValues,
                 label: 'Expense in Rs.',
                 backgroundColor: 'blue',
                 hoverBackgroundColor: 'green',
@@ -203,35 +224,35 @@ function displayChart() {
     });
 }
 
+function displayPieChart() {
+    const chartMonth = document.getElementById('chartMonth').value;
+    let yValues = [];
+    for (let i = 0; i < expenseTypes.length; i++) {
+        yValues.push(Math.floor(Math.random() * 100) + 1);
+    }
+    const colors = ['#2ecc71', '#3498db', '#9b59b6', '#34495e', '#f1c40f', '#e67e22', '#e74c3c', '#95a5a6', '#16a085', '#27ae60', '#2980b9', '#8e44ad', '#2c3e50', '#f39c12'];
+
+    const pieChartEle = document.getElementById('pieChart');
+    pieChartEle.style.display = "block";
+
+    new Chart('pieChart', {
+        type: "doughnut",
+        data: {
+            labels: expenseTypes,
+            datasets: [{
+                data: yValues,
+                backgroundColor: colors,
+            }]
+        },
+        options: {
+            title: {
+                display: true,
+                text: "Text to be displayed"
+            }
+        }
+    });
+}
+
 function getExpenseType(typeIndex) {
-    switch(typeIndex) {
-        case 0:
-            return "Food";
-        case 1:
-            return "Petrol/Gas";
-        case 2:
-            return "Entertainement";
-        case 3:
-            return "Fitness/Gym";
-        case 4:
-            return "Transport";
-        case 5:
-            return "Taxes";
-        case 6:
-            return "Investment";
-        case 7:
-            return "Shopping";
-        case 8:
-            return "Groceries";
-        case 9:
-            return "Bills";
-        case 10:
-            return "Books";
-        case 11:
-            return "Rent";
-        case 12:
-            return "EMI";
-        case 13:
-            return "Others";
-    }   
+    return expenseTypes[typeIndex];
 }
