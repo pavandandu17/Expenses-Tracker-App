@@ -72,8 +72,8 @@ async function addExpense() {
 }
 
 async function clearData() {
-    await axios.get('http://localhost:3000/deleteAll');
-    showTodayMonthExpense();
+    const x = await axios.get('http://localhost:3000/deleteAll');
+    location.reload();
 }
 
 function enableMonthDateInputs() {

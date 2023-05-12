@@ -34,6 +34,7 @@ app.get('/', (req, res) => {
 
 app.get("/deleteAll", async (req, res) => {
     await AppData.deleteMany();
+    res.send({});
 });
 
 app.post("/getExpenses", async (req, res) => {
