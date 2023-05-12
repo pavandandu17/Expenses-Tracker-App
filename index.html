@@ -39,6 +39,7 @@
                     <option value="10">Books</option>
                     <option value="11">Rent</option>
                     <option value="12">EMI</option>
+                    <option value="13">Others</option>
                 </select>
 
                 <label for="expenseDescription">Expense Description</label>
@@ -101,8 +102,8 @@
         <div id="analysisContainer">
             <div class="chartFormContainer">
                 <form id="chartForm">
-                    <label for="chartMonth"></label>
-                    <select name="chartMonth" id="chartMonth" oninput="displayChart()">
+                    <label for="chartMonth">Select Month:</label>
+                    <select name="chartMonth" id="chartMonth" oninput="enableChartTypeInput()">
                         <option value="" selected disabled>Select an option</option>
                         <option value="1">January</option>
                         <option value="2">February</option>
@@ -117,11 +118,23 @@
                         <option value="11">November</option>
                         <option value="12">December</option>
                     </select>
+
+                    <label for="chartType">Select Chart:</label>
+                    <select name="chartType" id="chartType" oninput="displayChart()" disabled>
+                        <option value="" selected disabled>Select</option>
+                        <option value="bar">Bar</option>
+                        <option value="pie">Pie</option>
+                    </select>
                 </form>
             </div>
-            <div class="chartContainer">
-                <canvas id="barChart"></canvas>
+            <div id="barChartContainer">
+                <canvas id="barChart" style="display: none"></canvas>
             </div>
+
+            <div id="pieChartContainer">
+                <canvas id="pieChart" style="display: none"></canvas>
+            </div>
+
         </div>
     </main>
 </body>
