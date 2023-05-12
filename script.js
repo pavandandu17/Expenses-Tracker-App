@@ -5,35 +5,36 @@ let today = new Date();
 window.onload = showTodayMonthExpense;
 
 async function sendData(data) {
-    const res = await axios.post('http://localhost:3000/api/endpoint', data);
+    const res = await axios.post('http://localhost:3000/addExpense', data);
 }
 
-async function getData() {
-    const data = 5;
-    const res = await axios.get('http://localhost:3000/api/endpoint', data);
+async function getExpenses(data) {
+    const res = await axios.get('http://localhost:3000/getExpenses', data);
+    return res;
+}
+
+async function getTotalAmount() {
+    const res = await axios.get('http://localhost:3000/getAmount', data);
+    return res;
 }
 
 function showTodayMonthExpense() {
     let todayDisplayElement = document.getElementById('todaysExpense');
     monthDisplayElement = document.getElementById('thisMonthsExpense');
 
-    const appData = JSON.parse(localStorage.getItem(localStorageKey));
+    let todaysExpense = getData({
+        year: today.getFullYear(),
+        month: today.getMonth(),
+        date:today.getDate()
+    });
 
-    if (appData == null) {
-        todayDisplayElement.innerText = "0/- Rs";
-        monthDisplayElement.innerText = "0/- Rs";
-    } else {
-        let todayDate = appData.expenses[today.getFullYear()][today.getMonth()][today.getDate()];
-        let currMonth = appData.expenses[today.getFullYear()][today.getMonth()];
-        if (todayDate == undefined)
-            todayDisplayElement.innerText = "0/- Rs";
-        else
-            todayDisplayElement.innerText = (appData.expenses[today.getFullYear()][today.getMonth()][today.getDate()].totalSum) + "/- Rs";
-        if (currMonth == undefined)
-            monthDisplayElement.innerText = "0/- Rs";
-        else
-            monthDisplayElement.innerText = (appData.expenses[today.getFullYear()][today.getMonth()].totalSum) + "/- Rs";
-    }
+    let monthsExpense = getData({
+        year: today.getFullYear(),
+        month: today.getMonth()
+    })
+
+    monthDisplayElement.innerText = monthsExpense + "/- Rs";
+    todayDisplayElement.innerText = todaysExpense + "/- Rs";
 }
 
 function addExpense() {
@@ -57,7 +58,6 @@ function addExpense() {
 
 function clearData() {
     localStorage.clear();
-    // displayExpenses();
 
     showTodayMonthExpense();
 }
@@ -102,34 +102,30 @@ function submitForm2() {
         return;
     }
 
-    const appData = JSON.parse(localStorage.getItem(localStorageKey));
-    //If only year is selected
-    if (month == "") {
-        const data = appData.expenses[year];
+    let query = {};
+    query.year = year;
+    if(month != "")
+        query.month = month;
+    if(date != "") 
+        query.date = date;
+    
+    const expenses = getExpenses(query);
 
-        const tableEle = document.getElementById('displayTable');
-        const tHead = tableEle.querySelector('thead');
-        tHead.style.display = "table-header-group";
-        const tBody = tableEle.querySelector('tbody');
-        tBody.innerHTML = '';
-        let no = 1;
-        for (let month in data) {
-            if (month == 'totalSum')
-                continue;
-            for (let date in data[month]) {
-                if (date == 'totalSum')
-                    continue;
-                for (let expense of data[month][date].list) {
-                    let row = tBody.insertRow();
+    const tableEle = document.getElementById('displayTable');
+    const tHead = tableEle.querySelector('thead');
+    tHead.style.display = "table-header-group";
+    const tBody = tableEle.querySelector('tbody');
+    tBody.innerHTML = '';
+    
+    let no = 1;
+    for (let expense of expenses) {
+        let row = tBody.insertRow();
 
-                    row.insertCell().innerText = no++;
-                    row.insertCell().innerText = expense.expenseDate;
-                    row.insertCell().innerText = expense.expenseType;
-                    row.insertCell().innerText = expense.expenseDescription;
-                    row.insertCell().innerText = expense.expenseAmount;
-                }
-            }
-        }
+        row.insertCell().innerText = no++;
+        row.insertCell().innerText = getFormattedDate(expense.expenseDate);
+        row.insertCell().innerText = expense.expenseType;
+        row.insertCell().innerText = expense.expenseDescription;
+        row.insertCell().innerText = expense.expenseAmount;
     }
 }
 
@@ -213,4 +209,8 @@ function displayPieChart() {
 
 function getExpenseType(typeIndex) {
     return expenseTypes[typeIndex];
+}
+
+function getFormattedDate(dateObj) {
+    return dateObj.getDate() + "-" + dateObj.getMonth() + "-" + dateObj.getFullYear();
 }
