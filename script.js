@@ -201,4 +201,37 @@ function displayChart() {
         },
         options: {}
     });
-};
+}
+
+function getExpenseType(typeIndex) {
+    switch(typeIndex) {
+        case 0:
+            return "Food";
+        case 1:
+            return "Petrol/Gas";
+        case 2:
+            return "Entertainement";
+        case 3:
+            return "Fitness/Gym";
+        case 4:
+            return "Transport";
+        case 5:
+            return "Taxes";
+        case 6:
+            return "Investment";
+        case 7:
+            return "Shopping";
+        case 8:
+            return "Groceries";
+        case 9:
+            return "Bills";
+        case 10:
+            return "Books";
+        case 11:
+            return "Rent";
+        case 12:
+            return "EMI";
+        case 13:
+            return "Others";
+    }   
+}
