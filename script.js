@@ -5,16 +5,17 @@ let today = new Date();
 window.onload = showTodayMonthExpense;
 
 async function sendData(data) {
-    const res = await axios.post('http://localhost:3000/addExpense', data);
+    const res = await axios.post('https://expenses-tracker-app-backend.onrender.com/addExpense', data);
+    console.log(res);
 }
 
 async function getExpenses(data) {
-    const response = await axios.post('http://localhost:3000/getExpenses', data);
+    const response = await axios.post('https://expenses-tracker-app-backend.onrender.com/getExpenses', data);
     return response.data;
 }
 
 async function getTotalAmount(data) {
-    const response = await axios.post('http://localhost:3000/getAmount', data);
+    const response = await axios.post('https://expenses-tracker-app-backend.onrender.com/getAmount', data);
     return response.data;
 }
 
@@ -114,7 +115,7 @@ async function addExpense() {
 }
 
 async function clearData() {
-    const x = await axios.get('http://localhost:3000/deleteAll');
+    const x = await axios.get('https://expenses-tracker-app-backend.onrender.com/deleteAll');
     location.reload();
 }
 
@@ -166,6 +167,7 @@ async function submitForm2() {
 
     var expenses = 0;
     expenses = await getExpenses(query);
+    console.log(expenses);
 
     const tableEle = document.getElementById('displayTable');
     const tHead = tableEle.querySelector('thead');
@@ -230,7 +232,7 @@ async function displayBarChart() {
         yValues.push(0);
     }
 
-    let dayExpenses = (await axios.post('http://localhost:3000/getBarChartData', query)).data;
+    let dayExpenses = (await axios.post('https://expenses-tracker-app-backend.onrender.com/getBarChartData', query)).data;
     for (let expense of dayExpenses) {
         yValues[expense._id.date] = expense.totalExpenses;
     }
@@ -262,7 +264,7 @@ async function displayPieChart() {
         year: Number(chartYear),
         month: Number(chartMonth - 1)
     };
-    const d = (await axios.post("http://localhost:3000/getPieChartData", query)).data;
+    const d = (await axios.post("https://expenses-tracker-app-backend.onrender.com/getPieChartData", query)).data;
     for (let i of d) {
         yValues[i._id] = i.totalExpenseAmount;
     }
