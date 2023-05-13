@@ -4,6 +4,14 @@ const mongoose = require('mongoose');
 
 const AppData = require("./models/AppData");
 
+//Connecting DB
+const DBLink = 'mongodb+srv://pavandandu17:trhtvgsdp@cluster0.xjicp93.mongodb.net/expensestrackerapp?retryWrites=true&w=majority';
+mongoose.connect(DBLink, {
+    useNewUrlParser: true,
+}).then(() => {
+    console.log("DB Connected Successfully");
+}).catch((err) => console.log(err));
+
 //to allow Access
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -15,15 +23,6 @@ app.use((req, res, next) => {
 //to parse req.body
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-
-//for connecting to database
-main().catch(err => console.log(err));
-
-async function main() {
-    await mongoose.connect('mongodb://127.0.0.1:27017/AppData');
-}
-console.log("Connected.....")
 
 //Routes
 app.get('/', (req, res) => {
