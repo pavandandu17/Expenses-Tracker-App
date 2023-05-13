@@ -9,35 +9,92 @@ async function sendData(data) {
 }
 
 async function getExpenses(data) {
-    const res = await axios.get('http://localhost:3000/getExpenses', data);
-    return res;
+    const response = await axios.post('http://localhost:3000/getExpenses', data);
+    return response.data;
 }
 
-async function getTotalAmount() {
-    const res = await axios.get('http://localhost:3000/getAmount', data);
-    return res;
+async function getTotalAmount(data) {
+    const response = await axios.post('http://localhost:3000/getAmount', data);
+    return response.data;
 }
 
-function showTodayMonthExpense() {
+async function showTodayMonthExpense() {
     let todayDisplayElement = document.getElementById('todaysExpense');
     monthDisplayElement = document.getElementById('thisMonthsExpense');
 
-    let todaysExpense = getData({
+    //Calculating yesterday's date
+    let yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+
+    let yesterdaysExpense = (await getTotalAmount({
+        year: yesterday.getFullYear(),
+        month: yesterday.getMonth(),
+        date: yesterday.getDate()
+    })).data;
+
+    let todaysExpense = (await getTotalAmount({
         year: today.getFullYear(),
         month: today.getMonth(),
-        date:today.getDate()
-    });
+        date: today.getDate()
+    })).data;
 
-    let monthsExpense = getData({
+    const increaseCharacter = '\u25B2';
+    const decreaseCharacter = '\u25BC';
+
+    //Gets an array which contains [percentIncreased, percentChange]
+    // let [isExpenseIncreased, percentChange] = getPercentChange(yesterdaysExpense, todaysExpense);
+
+    let datePercentChangeText = null;
+    if (todaysExpense == yesterdaysExpense) {
+
+    } else if (todaysExpense > yesterdaysExpense) {
+        datePercentChangeText = `${increaseCharacter} ${(todaysExpense - yesterdaysExpense)}/- Rs`;
+
+        const displayEle = document.getElementById('datePercentChange');
+        displayEle.style.color = "red";
+        displayEle.innerText = datePercentChangeText;
+    } else {
+        datePercentChangeText = `${decreaseCharacter} ${yesterdaysExpense - todaysExpense}/- Rs`;
+
+        const displayEle = document.getElementById('datePercentChange');
+        displayEle.style.color = "green";
+        displayEle.innerText = datePercentChangeText;
+    }
+
+    const prevMonthDate = (new Date(today.getFullYear(), today.getMonth() - 1));
+    let monthsExpense = (await getTotalAmount({
         year: today.getFullYear(),
         month: today.getMonth()
-    })
+    })).data;
 
-    monthDisplayElement.innerText = monthsExpense + "/- Rs";
-    todayDisplayElement.innerText = todaysExpense + "/- Rs";
+    let prevMonthsExpense = (await getTotalAmount({
+        year: prevMonthDate.getFullYear(),
+        month: prevMonthDate.getMonth()
+    })).data;
+
+    // [isExpenseIncreased, percentChange] = getPercentChange(prevMonthsExpense, monthsExpense);
+    datePercentChangeText = null;
+    if (monthsExpense == prevMonthsExpense) {
+
+    } else if (monthsExpense > prevMonthsExpense) {
+        datePercentChangeText = `${increaseCharacter} ${Math.abs(monthsExpense - prevMonthsExpense)}/- Rs`;
+
+        const displayEle = document.getElementById('monthPercentChange');
+        displayEle.style.color = "red";
+        displayEle.innerText = datePercentChangeText;
+    } else {
+        datePercentChangeText = `${decreaseCharacter} ${Math.abs(monthsExpense - prevMonthsExpense)}/- Rs`;
+
+        const displayEle = document.getElementById('monthPercentChange');
+        displayEle.style.color = "green";
+        displayEle.innerText = datePercentChangeText;
+    }
+
+    monthDisplayElement.innerText = monthsExpense + "/- Rs ";
+    todayDisplayElement.innerText = todaysExpense + "/- Rs ";
 }
 
-function addExpense() {
+async function addExpense() {
     let expenseType = document.getElementById('expenseType').value;
     let expenseDescription = document.getElementById('expenseDescription').value;
     let expenseAmount = Number(document.getElementById('expenseAmount').value);
@@ -56,12 +113,10 @@ function addExpense() {
     showTodayMonthExpense();
 }
 
-function clearData() {
-    localStorage.clear();
-
-    showTodayMonthExpense();
+async function clearData() {
+    const x = await axios.get('http://localhost:3000/deleteAll');
+    location.reload();
 }
-
 
 function enableMonthDateInputs() {
     const monthInputEle = document.getElementById('month');
@@ -85,7 +140,7 @@ function updateDateInput() {
     dateInputEle.max = daysInMonth;
 }
 
-function submitForm2() {
+async function submitForm2() {
     event.preventDefault();
 
     const yearInputEle = document.getElementById('year');
@@ -104,29 +159,35 @@ function submitForm2() {
 
     let query = {};
     query.year = year;
-    if(month != "")
+    if (month != "")
         query.month = month;
-    if(date != "") 
+    if (date != "")
         query.date = date;
-    
-    const expenses = getExpenses(query);
+
+    var expenses = 0;
+    expenses = await getExpenses(query);
 
     const tableEle = document.getElementById('displayTable');
     const tHead = tableEle.querySelector('thead');
     tHead.style.display = "table-header-group";
     const tBody = tableEle.querySelector('tbody');
     tBody.innerHTML = '';
-    
+
     let no = 1;
     for (let expense of expenses) {
         let row = tBody.insertRow();
 
         row.insertCell().innerText = no++;
-        row.insertCell().innerText = getFormattedDate(expense.expenseDate);
-        row.insertCell().innerText = expense.expenseType;
+        row.insertCell().innerText = getFormattedDate(expense.date, expense.month + 1, expense.year);
+        row.insertCell().innerText = getExpenseType(expense.expenseType);
         row.insertCell().innerText = expense.expenseDescription;
         row.insertCell().innerText = expense.expenseAmount;
     }
+}
+
+function enableChartMonthInput() {
+    const chartMonthInputEle = document.getElementById('chartMonth');
+    chartMonthInputEle.disabled = false;
 }
 
 function enableChartTypeInput() {
@@ -135,6 +196,7 @@ function enableChartTypeInput() {
 }
 
 function displayChart() {
+    event.preventDefault();
     const chartType = document.getElementById('chartType').value;
     if (chartType == "bar") {
         const pieChartEle = document.getElementById('pieChart');
@@ -146,7 +208,8 @@ function displayChart() {
         displayPieChart();
     }
 }
-function displayBarChart() {
+async function displayBarChart() {
+    const chartYear = document.getElementById('chartYear').value;
     const chartMonth = document.getElementById('chartMonth').value;
     const daysInMonth = new Date(2023, chartMonth, 0).getDate();
 
@@ -158,9 +221,18 @@ function displayBarChart() {
         labels.push(i)
     }
 
+    let query = {
+        year: Number(chartYear),
+        month: Number(chartMonth - 1)
+    };
     let yValues = [];
     for (let i = 1; i <= daysInMonth; i++) {
-        yValues.push(Math.floor(Math.random() * 500) + 1);
+        yValues.push(0);
+    }
+
+    let dayExpenses = (await axios.post('http://localhost:3000/getBarChartData', query)).data;
+    for (let expense of dayExpenses) {
+        yValues[expense._id.date] = expense.totalExpenses;
     }
 
     const barChart = new Chart('barChart', {
@@ -178,13 +250,23 @@ function displayBarChart() {
     });
 }
 
-function displayPieChart() {
+async function displayPieChart() {
     const chartMonth = document.getElementById('chartMonth').value;
     let yValues = [];
     for (let i = 0; i < expenseTypes.length; i++) {
-        yValues.push(Math.floor(Math.random() * 100) + 1);
+        yValues.push(0);
     }
     const colors = ['#2ecc71', '#3498db', '#9b59b6', '#34495e', '#f1c40f', '#e67e22', '#e74c3c', '#95a5a6', '#16a085', '#27ae60', '#2980b9', '#8e44ad', '#2c3e50', '#f39c12'];
+    const chartYear = document.getElementById('chartYear').value;
+    let query = {
+        year: Number(chartYear),
+        month: Number(chartMonth - 1)
+    };
+    const d = (await axios.post("http://localhost:3000/getPieChartData", query)).data;
+    for (let i of d) {
+        yValues[i._id] = i.totalExpenseAmount;
+    }
+
 
     const pieChartEle = document.getElementById('pieChart');
     pieChartEle.style.display = "block";
@@ -211,6 +293,33 @@ function getExpenseType(typeIndex) {
     return expenseTypes[typeIndex];
 }
 
-function getFormattedDate(dateObj) {
-    return dateObj.getDate() + "-" + dateObj.getMonth() + "-" + dateObj.getFullYear();
+function getFormattedDate(date, month, year) {
+    return date + "-" + month + "-" + year;
+}
+
+function getPercentChange(yesterdaysExpense, todaysExpense) {
+    let isExpenseIncreased = null;
+    let percentChange = null;
+    if (todaysExpense == 0 && yesterdaysExpense == 0) {
+        isExpenseIncreased = null;
+        percentChange = 0;
+    } else if (todaysExpense == 0) {
+        percentChange = yesterdaysExpense;
+        isExpenseIncreased = false;
+    } else if (yesterdaysExpense == 0) {
+        percentChange = todaysExpense;
+        isExpenseIncreased = true;
+    } else {
+        percentChange = (todaysExpense / yesterdaysExpense) * 100;
+        if (percentChange < 100) {
+            percentChange = 100 - percentChange;
+            isExpenseIncreased = false;
+        } else {
+            isExpenseIncreased = true;
+        }
+    }
+
+    // console.log(isExpenseIncreased);
+    // console.log(percentChange);
+    return [isExpenseIncreased, percentChange];
 }
