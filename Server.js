@@ -104,9 +104,6 @@ app.post('/getPieChartData', async (req, res) => {
         })
 });
 
-app.listen(3000, (req, res) => {
-    console.log("Listening on POrt 3000");
-});
 
 function calculate(Array) {
     let amount = 0;
@@ -115,3 +112,8 @@ function calculate(Array) {
     }
     return amount;
 }
+
+const port = process.env.PORT || 3000;
+app.listen(port, (req, res) => {
+    console.log(`Running Server on ${port}`);
+});
