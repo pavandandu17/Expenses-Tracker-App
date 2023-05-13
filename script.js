@@ -42,19 +42,19 @@ async function showTodayMonthExpense() {
     const decreaseCharacter = '\u25BC';
 
     //Gets an array which contains [percentIncreased, percentChange]
-    let [isExpenseIncreased, percentChange] = getPercentChange(yesterdaysExpense, todaysExpense);
+    // let [isExpenseIncreased, percentChange] = getPercentChange(yesterdaysExpense, todaysExpense);
 
     let datePercentChangeText = null;
-    if (isExpenseIncreased == null) {
+    if (todaysExpense == yesterdaysExpense) {
 
-    } else if (isExpenseIncreased) {
-        datePercentChangeText = `${increaseCharacter} ${percentChange}%`;
+    } else if (todaysExpense > yesterdaysExpense) {
+        datePercentChangeText = `${increaseCharacter} ${(todaysExpense - yesterdaysExpense)}/- Rs`;
 
         const displayEle = document.getElementById('datePercentChange');
         displayEle.style.color = "red";
         displayEle.innerText = datePercentChangeText;
     } else {
-        datePercentChangeText = `${decreaseCharacter} ${percentChange}%`;
+        datePercentChangeText = `${decreaseCharacter} ${yesterdaysExpense - todaysExpense}/- Rs`;
 
         const displayEle = document.getElementById('datePercentChange');
         displayEle.style.color = "green";
@@ -72,18 +72,18 @@ async function showTodayMonthExpense() {
         month: prevMonthDate.getMonth()
     })).data;
 
-    [isExpenseIncreased, percentChange] = getPercentChange(prevMonthsExpense, monthsExpense);
+    // [isExpenseIncreased, percentChange] = getPercentChange(prevMonthsExpense, monthsExpense);
     datePercentChangeText = null;
-    if (isExpenseIncreased == null) {
+    if (monthsExpense == prevMonthsExpense) {
 
-    } else if (isExpenseIncreased) {
-        datePercentChangeText = `${increaseCharacter} ${percentChange}%`;
+    } else if (monthsExpense > prevMonthsExpense) {
+        datePercentChangeText = `${increaseCharacter} ${Math.abs(monthsExpense - prevMonthsExpense)}/- Rs`;
 
         const displayEle = document.getElementById('monthPercentChange');
         displayEle.style.color = "red";
         displayEle.innerText = datePercentChangeText;
     } else {
-        datePercentChangeText = `${decreaseCharacter} ${percentChange}%`;
+        datePercentChangeText = `${decreaseCharacter} ${Math.abs(monthsExpense - prevMonthsExpense)}/- Rs`;
 
         const displayEle = document.getElementById('monthPercentChange');
         displayEle.style.color = "green";
@@ -185,12 +185,18 @@ async function submitForm2() {
     }
 }
 
+function enableChartMonthInput() {
+    const chartMonthInputEle = document.getElementById('chartMonth');
+    chartMonthInputEle.disabled = false;
+}
+
 function enableChartTypeInput() {
     const chartTypeEle = document.getElementById('chartType');
     chartTypeEle.disabled = false;
 }
 
 function displayChart() {
+    event.preventDefault();
     const chartType = document.getElementById('chartType').value;
     if (chartType == "bar") {
         const pieChartEle = document.getElementById('pieChart');
@@ -202,7 +208,8 @@ function displayChart() {
         displayPieChart();
     }
 }
-function displayBarChart() {
+async function displayBarChart() {
+    const chartYear = document.getElementById('chartYear').value;
     const chartMonth = document.getElementById('chartMonth').value;
     const daysInMonth = new Date(2023, chartMonth, 0).getDate();
 
@@ -214,9 +221,18 @@ function displayBarChart() {
         labels.push(i)
     }
 
+    let query = {
+        year: Number(chartYear),
+        month: Number(chartMonth - 1)
+    };
     let yValues = [];
     for (let i = 1; i <= daysInMonth; i++) {
-        yValues.push(Math.floor(Math.random() * 500) + 1);
+        yValues.push(0);
+    }
+
+    let dayExpenses = (await axios.post('http://localhost:3000/getBarChartData', query)).data;
+    for (let expense of dayExpenses) {
+        yValues[expense._id.date] = expense.totalExpenses;
     }
 
     const barChart = new Chart('barChart', {
@@ -234,13 +250,23 @@ function displayBarChart() {
     });
 }
 
-function displayPieChart() {
+async function displayPieChart() {
     const chartMonth = document.getElementById('chartMonth').value;
     let yValues = [];
     for (let i = 0; i < expenseTypes.length; i++) {
-        yValues.push(Math.floor(Math.random() * 100) + 1);
+        yValues.push(0);
     }
     const colors = ['#2ecc71', '#3498db', '#9b59b6', '#34495e', '#f1c40f', '#e67e22', '#e74c3c', '#95a5a6', '#16a085', '#27ae60', '#2980b9', '#8e44ad', '#2c3e50', '#f39c12'];
+    const chartYear = document.getElementById('chartYear').value;
+    let query = {
+        year: Number(chartYear),
+        month: Number(chartMonth - 1)
+    };
+    const d = (await axios.post("http://localhost:3000/getPieChartData", query)).data;
+    for (let i of d) {
+        yValues[i._id] = i.totalExpenseAmount;
+    }
+
 
     const pieChartEle = document.getElementById('pieChart');
     pieChartEle.style.display = "block";

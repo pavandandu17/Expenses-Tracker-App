@@ -22,8 +22,6 @@ main().catch(err => console.log(err));
 
 async function main() {
     await mongoose.connect('mongodb://127.0.0.1:27017/AppData');
-
-
 }
 console.log("Connected.....")
 
@@ -50,11 +48,61 @@ app.post("/getAmount", async (req, res) => {
     const records = await AppData.find(req.body);
     const Amount = calculate(records);
     res.send({ data: Amount });
-})
+});
+
 app.post('/addExpense', async (req, res) => {
     const dataToAdd = req.body;
     const data = new AppData(dataToAdd);
     const x = await data.save();
+});
+
+app.post('/getBarChartData', async (req, res) => {
+    AppData.aggregate([
+        {
+            $match: {
+                year: req.body.year,
+                month: req.body.month
+            }
+        },
+        {
+            $group: {
+                _id: { year: "$year", month: "$month", date: "$date" },
+                totalExpenses: { $sum: "$expenseAmount" }
+            }
+        }
+    ])
+        .then((results) => {
+            res.json(results);
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({ error: 'An error occured' });
+        });
+});
+
+app.post('/getPieChartData', async (req, res) => {
+    AppData.aggregate([
+        {
+            $match: {
+                year: req.body.year,
+                month: req.body.month,
+            },
+        },
+        {
+            $group: {
+                _id: '$expenseType',
+                totalExpenseAmount: { $sum: '$expenseAmount' },
+            },
+        },
+    ])
+        .then(results => {
+            console.log(results);
+            res.json(results);
+        })
+        .catch(err => {
+            console.error(err);
+            res.status(500).json({ error: 'An error occured' });
+        })
 });
 
 app.listen(3000, (req, res) => {

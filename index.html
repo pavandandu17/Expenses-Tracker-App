@@ -19,13 +19,13 @@
     </header>
     <main>
 
-        <h3>This month's expense:
-            <span id="thisMonthsExpense"></span>
-            <span id="monthPercentChange"></span>
-        </h3>
         <h3>Today's expense:
             <span id="todaysExpense"></span>
             <span id="datePercentChange"></span>
+        </h3>
+        <h3>This month's expense:
+            <span id="thisMonthsExpense"></span>
+            <span id="monthPercentChange"></span>
         </h3>
         <div class="formContainer">
             <form onsubmit="addExpense()" id="inputForm1">
@@ -108,8 +108,12 @@
         <div id="analysisContainer">
             <div class="chartFormContainer">
                 <form id="chartForm">
+
+                    <label for="chartYear">Year:</label>
+                    <input type="number" name="chartYear" id="chartYear" min="1900" max="2023"
+                        oninput="enableChartMonthInput()" required>
                     <label for="chartMonth">Select Month:</label>
-                    <select name="chartMonth" id="chartMonth" oninput="enableChartTypeInput()">
+                    <select name="chartMonth" id="chartMonth" oninput="enableChartTypeInput()" disabled>
                         <option value="" selected disabled>Select an option</option>
                         <option value="1">January</option>
                         <option value="2">February</option>
@@ -126,11 +130,13 @@
                     </select>
 
                     <label for="chartType">Select Chart:</label>
-                    <select name="chartType" id="chartType" oninput="displayChart()" disabled>
+                    <select name="chartType" id="chartType" disabled>
                         <option value="" selected disabled>Select</option>
                         <option value="bar">Bar</option>
                         <option value="pie">Pie</option>
                     </select>
+
+                    <button type="submit" onclick="displayChart()">Display</button>
                 </form>
             </div>
             <div id="barChartContainer">
