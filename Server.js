@@ -12,14 +12,6 @@ mongoose.connect(DBLink, {
     console.log("DB Connected Successfully");
 }).catch((err) => console.log(err));
 
-//Connecting DB
-const DBLink = 'mongodb+srv://pavandandu17:trhtvgsdp@cluster0.xjicp93.mongodb.net/expensestrackerapp?retryWrites=true&w=majority';
-mongoose.connect(DBLink, {
-    useNewUrlParser: true,
-}).then(() => {
-    console.log("DB Connected Successfully");
-}).catch((err) => console.log(err));
-
 //to allow Access
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -120,3 +112,8 @@ function calculate(Array) {
     }
     return amount;
 }
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, function () {
+    console.log(`Running Server on ${PORT}`);
+});
