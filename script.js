@@ -3,29 +3,14 @@ const expenseTypes = ['Food', 'Petrol/Gas', 'Entertainment', 'Fitness/Gym', 'Tra
 let today = new Date();
 
 window.onload = showTodayMonthExpense;
-// let data = {
-//     year: 2023
-// }
-// fdata(data);
-// async function fdata(data) {
-//     const d = await axios.post('http://localhost:3000/getExpenses', data);
-//     console.log(d);
-// }
 
 async function sendData(data) {
-    try {
-        const res = await axios.post('http://localhost:3000/addExpense', data);
-        console.log("RES:")
-        console.log(res);
-    } catch (err) {
-        console.log(err);
-    }
+    const res = await axios.post('http://localhost:3000/addExpense', data);
 }
 
 async function getExpenses(data) {
     const response = await axios.post('http://localhost:3000/getExpenses', data);
     return response.data;
-
 }
 
 async function getTotalAmount(data) {
@@ -37,19 +22,76 @@ async function showTodayMonthExpense() {
     let todayDisplayElement = document.getElementById('todaysExpense');
     monthDisplayElement = document.getElementById('thisMonthsExpense');
 
+    //Calculating yesterday's date
+    let yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+
+    let yesterdaysExpense = (await getTotalAmount({
+        year: yesterday.getFullYear(),
+        month: yesterday.getMonth(),
+        date: yesterday.getDate()
+    })).data;
+
     let todaysExpense = (await getTotalAmount({
         year: today.getFullYear(),
         month: today.getMonth(),
         date: today.getDate()
     })).data;
 
+    const increaseCharacter = '\u25B2';
+    const decreaseCharacter = '\u25BC';
+
+    //Gets an array which contains [percentIncreased, percentChange]
+    let [isExpenseIncreased, percentChange] = getPercentChange(yesterdaysExpense, todaysExpense);
+
+    let datePercentChangeText = null;
+    if (isExpenseIncreased == null) {
+
+    } else if (isExpenseIncreased) {
+        datePercentChangeText = `${increaseCharacter} ${percentChange}%`;
+
+        const displayEle = document.getElementById('datePercentChange');
+        displayEle.style.color = "red";
+        displayEle.innerText = datePercentChangeText;
+    } else {
+        datePercentChangeText = `${decreaseCharacter} ${percentChange}%`;
+
+        const displayEle = document.getElementById('datePercentChange');
+        displayEle.style.color = "green";
+        displayEle.innerText = datePercentChangeText;
+    }
+
+    const prevMonthDate = (new Date(today.getFullYear(), today.getMonth() - 1));
     let monthsExpense = (await getTotalAmount({
         year: today.getFullYear(),
         month: today.getMonth()
     })).data;
 
-    monthDisplayElement.innerText = monthsExpense + "/- Rs";
-    todayDisplayElement.innerText = todaysExpense + "/- Rs";
+    let prevMonthsExpense = (await getTotalAmount({
+        year: prevMonthDate.getFullYear(),
+        month: prevMonthDate.getMonth()
+    })).data;
+
+    [isExpenseIncreased, percentChange] = getPercentChange(prevMonthsExpense, monthsExpense);
+    datePercentChangeText = null;
+    if (isExpenseIncreased == null) {
+
+    } else if (isExpenseIncreased) {
+        datePercentChangeText = `${increaseCharacter} ${percentChange}%`;
+
+        const displayEle = document.getElementById('monthPercentChange');
+        displayEle.style.color = "red";
+        displayEle.innerText = datePercentChangeText;
+    } else {
+        datePercentChangeText = `${decreaseCharacter} ${percentChange}%`;
+
+        const displayEle = document.getElementById('monthPercentChange');
+        displayEle.style.color = "green";
+        displayEle.innerText = datePercentChangeText;
+    }
+
+    monthDisplayElement.innerText = monthsExpense + "/- Rs ";
+    todayDisplayElement.innerText = todaysExpense + "/- Rs ";
 }
 
 async function addExpense() {
@@ -133,7 +175,6 @@ async function submitForm2() {
 
     let no = 1;
     for (let expense of expenses) {
-        console.log(expense);
         let row = tBody.insertRow();
 
         row.insertCell().innerText = no++;
@@ -228,4 +269,31 @@ function getExpenseType(typeIndex) {
 
 function getFormattedDate(date, month, year) {
     return date + "-" + month + "-" + year;
+}
+
+function getPercentChange(yesterdaysExpense, todaysExpense) {
+    let isExpenseIncreased = null;
+    let percentChange = null;
+    if (todaysExpense == 0 && yesterdaysExpense == 0) {
+        isExpenseIncreased = null;
+        percentChange = 0;
+    } else if (todaysExpense == 0) {
+        percentChange = yesterdaysExpense;
+        isExpenseIncreased = false;
+    } else if (yesterdaysExpense == 0) {
+        percentChange = todaysExpense;
+        isExpenseIncreased = true;
+    } else {
+        percentChange = (todaysExpense / yesterdaysExpense) * 100;
+        if (percentChange < 100) {
+            percentChange = 100 - percentChange;
+            isExpenseIncreased = false;
+        } else {
+            isExpenseIncreased = true;
+        }
+    }
+
+    // console.log(isExpenseIncreased);
+    // console.log(percentChange);
+    return [isExpenseIncreased, percentChange];
 }
