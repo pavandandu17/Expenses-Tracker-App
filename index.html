@@ -5,10 +5,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" href="style.css">
+    <!-- CSS Files Begin-->
+    <link rel="stylesheet" href="CSS/style.css">
+    <link rel="stylesheet" href="CSS/header.css">
+    <link rel="stylesheet" href="CSS/report.css">
+    <!-- CSS Files End-->
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script src="script.js"></script>
 
     <title>Expenses Tracker</title>
 </head>
@@ -16,18 +20,24 @@
 <body>
     <header>
         <h1>Expenses Tracker</h1>
+        <nav>
+            <button onclick="displayAddExpense()">Add Expense</button>
+            <button onclick="displayReport()">Report</button>
+            <button onclick="displayAnalyze()">Analyze</button>
+        </nav>
     </header>
     <main>
-
-        <h3>Today's expense:
-            <span id="todaysExpense"></span>
-            <span id="datePercentChange"></span>
-        </h3>
-        <h3>This month's expense:
-            <span id="thisMonthsExpense"></span>
-            <span id="monthPercentChange"></span>
-        </h3>
-        <div class="formContainer">
+        <div id="initialDisplayContainer">
+            <h3>Today's expense:
+                <span id="todaysExpense"></span>
+                <span id="datePercentChange"></span>
+            </h3>
+            <h3>This month's expense:
+                <span id="thisMonthsExpense"></span>
+                <span id="monthPercentChange"></span>
+            </h3>
+        </div>
+        <div id="formContainer">
             <form onsubmit="addExpense()" id="inputForm1">
                 <label for="expenseType">Expense Type</label>
                 <select name="expenseType" id="expenseType">
@@ -62,52 +72,51 @@
             </form>
 
         </div>
-        <button id="deleteButton" onclick="clearData()">Delete Data</button>
 
-        <hr>
+        <div id="reportContainer" style="display: none">
+            <button id="deleteButton" onclick="clearData()">Delete Data</button>
+            <form onsubmit="submitForm2()" id="inputForm2">
+                <label for="year">Year</label>
+                <input type="number" name="year" id="year" min="1900" max="2023" oninput="enableMonthDateInputs()"
+                    required>
 
-        <form onsubmit="submitForm2()" id="inputForm2">
-            <label for="year">Year</label>
-            <input type="number" name="year" id="year" min="1900" max="2023" oninput="enableMonthDateInputs()" required>
+                <label for="month">Month(optional)</label>
+                <select name="month" id="month" oninput="updateDateInput()" disabled>
+                    <option value="" selected disabled>Select an option</option>
+                    <option value="0">January</option>
+                    <option value="1">February</option>
+                    <option value="2">March</option>
+                    <option value="3">April</option>
+                    <option value="4">May</option>
+                    <option value="5">June</option>
+                    <option value="6">July</option>
+                    <option value="7">August</option>
+                    <option value="8">September</option>
+                    <option value="9">October</option>
+                    <option value="10">November</option>
+                    <option value="11">December</option>
+                </select>
 
-            <label for="month">Month(optional)</label>
-            <select name="month" id="month" oninput="updateDateInput()" disabled>
-                <option value="" selected disabled>Select an option</option>
-                <option value="0">January</option>
-                <option value="1">February</option>
-                <option value="2">March</option>
-                <option value="3">April</option>
-                <option value="4">May</option>
-                <option value="5">June</option>
-                <option value="6">July</option>
-                <option value="7">August</option>
-                <option value="8">September</option>
-                <option value="9">October</option>
-                <option value="10">November</option>
-                <option value="11">December</option>
-            </select>
+                <label for="date">Date(optional)</label>
+                <input type="number" name="date" id="date" min="0" max="31" disabled>
 
-            <label for="date">Date(optional)</label>
-            <input type="number" name="date" id="date" min="0" max="31" disabled>
+                <button type="submit" id="form2SubmitButton" disabled>List Expenses</button>
+            </form>
+            <table id="displayTable">
+                <thead>
+                    <th>S.No.</th>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                    <th>Amount</th>
+                </thead>
+                <tbody>
 
-            <button type="submit" id="form2SubmitButton" disabled>List Expenses</button>
-        </form>
-        <table id="displayTable">
-            <thead>
-                <th>S.No.</th>
-                <th>Date</th>
-                <th>Type</th>
-                <th>Description</th>
-                <th>Amount</th>
-            </thead>
-            <tbody>
+                </tbody>
+            </table>
+        </div>
 
-            </tbody>
-        </table>
-
-        <hr>
-
-        <div id="analysisContainer">
+        <div id="analyzeContainer" style="display:none">
             <div class="chartFormContainer">
                 <form id="chartForm">
 
@@ -151,6 +160,11 @@
 
         </div>
     </main>
+
+    <!-- JavaScript Scripts Begin-->
+    <script src="Scripts/script.js"></script>
+    <script src="Scripts/spa.js"></script>
+    <!-- JavaScript Scripts End -->
 </body>
 
 </html>
